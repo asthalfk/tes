@@ -1,0 +1,91 @@
+	CREATE DATABASE tesDB;
+	
+	CREATE TABLE TB_IDENTITAS
+	(	
+		ID int IDENTITY(1,1) PRIMARY KEY
+		,Nama VARCHAR(5) COLLATE DATABASE_DEFAULT
+		
+	)
+
+	CREATE TABLE TB_PHONENUMBER
+	(	
+		ID int IDENTITY(1,1) PRIMARY KEY,
+		,IDPerson VARCHAR(5) COLLATE DATABASE_DEFAULT
+		,PhoneNumber1 VARCHAR(5) COLLATE DATABASE_DEFAULT
+		,PhoneNumber2 VARCHAR(5) COLLATE DATABASE_DEFAULT
+	)
+  
+
+-----------------------------------
+
+USE [QA]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[SP_Submit]
+@txtNama AS varchar(50),
+@txttelp AS varchar(50),
+@txttelp2 AS VARCHAR(50)
+
+AS
+BEGIN
+	SET NOCOUNT ON
+	
+	INSERT INTO TB_IDENTITAS (Nama) VALUES (@txtNama);
+	
+	INSERT INTO TB_PHONENUMBER (IDPerson,PhoneNumber1,PhoneNumber2) 
+			SELECT A.ID,@txttelp,@txttelp2
+				FROM TB_IDENTITAS A
+		
+END
+GO
+-------------------------------------------------
+
+USE [QA]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[SP_View]
+
+AS
+BEGIN
+	SET NOCOUNT ON
+	
+	SELECT Nama, PhoneNumber1, PhoneNumber2  From TB_IDENTITAS A INNER JOIN TB_PHONENUMBER B ON A.ID=A.PersonalID 
+	
+END
+GO
+
+---------------------------------
+
+USE [QA]
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[SP_Export]
+
+AS
+BEGIN
+	SET NOCOUNT ON
+	
+	SELECT Nama, PhoneNumber1, PhoneNumber2  From TB_IDENTITAS A INNER JOIN TB_PHONENUMBER B ON A.ID=A.PersonalID 
+			FOR JSON AUTO 
+	
+END
+GO
+
+
+
+
