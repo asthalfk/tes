@@ -1,91 +1,91 @@
-	CREATE DATABASE tesDB;
+	CREATE DATABASE test;
 	
 	CREATE TABLE TB_IDENTITAS
 	(	
 		ID int IDENTITY(1,1) PRIMARY KEY
-		,Nama VARCHAR(5) COLLATE DATABASE_DEFAULT
+		,Nama VARCHAR(100) COLLATE DATABASE_DEFAULT
 		
 	)
 
 	CREATE TABLE TB_PHONENUMBER
 	(	
 		ID int IDENTITY(1,1) PRIMARY KEY,
-		,IDPerson VARCHAR(5) COLLATE DATABASE_DEFAULT
-		,PhoneNumber1 VARCHAR(5) COLLATE DATABASE_DEFAULT
-		,PhoneNumber2 VARCHAR(5) COLLATE DATABASE_DEFAULT
+		,IDPerson VARCHAR(100) COLLATE DATABASE_DEFAULT
+		,PhoneNumber1 VARCHAR(800) COLLATE DATABASE_DEFAULT
+		,PhoneNumber2 VARCHAR(800) COLLATE DATABASE_DEFAULT
 	)
   
 
 -----------------------------------
 
-USE [QA]
+USE [test]
 GO
-
+/****** Object:  StoredProcedure [dbo].[SP_Submit]   
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 ALTER PROCEDURE [dbo].[SP_Submit]
-@txtNama AS varchar(50),
-@txttelp AS varchar(50),
-@txttelp2 AS VARCHAR(50)
+@txtNama AS varchar(100),
+@txttelp AS varchar(800),
+@txttelp2 AS VARCHAR(800)
 
+--exec [SP_Submit] 'ADI','0274865699','085743034990'
 AS
 BEGIN
 	SET NOCOUNT ON
+
+	INSERT INTO TB_IDENTITAS (Nama) values (@txtNama)
+	INSERT INTO TB_PHONENUMBER (IDPerson,PhoneNumber1,PhoneNumber2 ) values ((select MAX(id) from TB_IDENTITAS),@txttelp,@txttelp2)
 	
-	INSERT INTO TB_IDENTITAS (Nama) VALUES (@txtNama);
+	--print @txttelp
+	--print @txttelp2
 	
-	INSERT INTO TB_PHONENUMBER (IDPerson,PhoneNumber1,PhoneNumber2) 
-			SELECT A.ID,@txttelp,@txttelp2
-				FROM TB_IDENTITAS A
 		
 END
-GO
 -------------------------------------------------
 
-USE [QA]
+USE [test]
 GO
-
+/****** Object:  StoredProcedure [dbo].[SP_View]    
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+--exec [SP_View]
 ALTER PROCEDURE [dbo].[SP_View]
 
 AS
 BEGIN
 	SET NOCOUNT ON
 	
-	SELECT Nama, PhoneNumber1, PhoneNumber2  From TB_IDENTITAS A INNER JOIN TB_PHONENUMBER B ON A.ID=A.PersonalID 
+	SELECT Nama, PhoneNumber1, PhoneNumber2  From TB_IDENTITAS A INNER JOIN TB_PHONENUMBER B ON A.ID=B.IDPerson 
 	
 END
-GO
-
 ---------------------------------
 
-USE [QA]
+USE [test]
 GO
-
+/****** Object:  StoredProcedure [dbo].[SP_Export]  
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 
+--exec [SP_Export]
 ALTER PROCEDURE [dbo].[SP_Export]
 
 AS
 BEGIN
 	SET NOCOUNT ON
 	
-	SELECT Nama, PhoneNumber1, PhoneNumber2  From TB_IDENTITAS A INNER JOIN TB_PHONENUMBER B ON A.ID=A.PersonalID 
-			FOR JSON AUTO 
+	SELECT Nama, PhoneNumber1, PhoneNumber2  
+		FROM TB_IDENTITAS A INNER JOIN TB_PHONENUMBER B ON A.ID=B.IDPerson 
+		FOR JSON AUTO	
+		--FOR JSON PATH
+		--FOR XML RAW
 	
 END
-GO
-
-
 
 
